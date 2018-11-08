@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using nstu_olympiad_site.Data;
 
 namespace nstu_olympiad_site
 {
@@ -24,6 +26,9 @@ namespace nstu_olympiad_site
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+            );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
