@@ -6,7 +6,7 @@ namespace nstu_olympiad_site.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> OlympUsers { get; set; }
         public DbSet<Competitor> Competitors { get; set; }
         public DbSet<School> Organizations { get; set; }
         public DbSet<Clarification> Clarifications { get; set; }
