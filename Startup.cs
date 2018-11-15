@@ -14,11 +14,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using nstu_olympiad_site.Data;
 using nstu_olympiad_site.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using nstu_olympiad_site.Utils.Auth;
 
 namespace nstu_olympiad_site
 {
     public class Startup
     {
+        //VERY SECRET KEY!
+        //TODO: Delete this later
+        private const string SecureKey = "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH"; 
+        private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecureKey));
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,11 +37,49 @@ namespace nstu_olympiad_site
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
+            services.Configure<JwtIssuerOptions>(options => 
+            {
+                options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
+                options.SigningCredentials = new SigningCredentials(_signingKey,
+                SecurityAlgorithms.HmacSha256);
+            });
+
+            services.AddSingleton<IJwtFactory, JwtFactory>();
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
+
+                ValidateAudience = true,
+                ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _signingKey,
+
+                RequireExpirationTime = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(configureOptions => 
+            {
+                configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                configureOptions.TokenValidationParameters = tokenValidationParameters;
+                configureOptions.SaveToken = true;
+            });
+
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"), x => x.SuppressForeignKeyEnforcement())
             );
             services.AddAuthorization(options => {
-                options.AddPolicy("User", policy => policy.RequireClaim("admin", "access"));
+                options.AddPolicy("User", policy => policy.RequireClaim("rol", "id"));
             });
 
             //Настройки авторизации
