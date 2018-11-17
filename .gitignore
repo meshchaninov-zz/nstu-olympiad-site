@@ -1,4 +1,8 @@
 bin/
+<<<<<<< HEAD
 obj/
 Migrations/
 data.db
+=======
+obj/
+>>>>>>> 1ae2197ba19a282645dcb48d37aea1318a453c8a
