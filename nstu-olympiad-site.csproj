@@ -9,10 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
-<<<<<<< HEAD
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
-=======
->>>>>>> 1ae2197ba19a282645dcb48d37aea1318a453c8a
   </ItemGroup>
 
   <ItemGroup>
